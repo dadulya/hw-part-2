@@ -1,42 +1,34 @@
 package org.skypro.skyshop;
 
-import org.skypro.skyshop.product.Product;
-import org.skypro.skyshop.basket.ProductBasket;
+import org.skypro.skyshop.article.Article;
+import org.skypro.skyshop.product.*;
+import org.skypro.skyshop.search.SearchEngine;
+import org.skypro.skyshop.search.Searchable;
+
+import java.util.Arrays;
 
 public class App {
     public static void main(String[] args) {
 
-        Product apple = new Product("Яблоко", 50);
-        Product milk = new Product("Молоко", 60);
-        Product bread = new Product("Хлеб", 40);
-        Product orange = new Product("Апельсин", 60);
-        Product butter = new Product("Масло", 45);
-        Product banana = new Product("Банан", 50); //"Невозможно добавить продукт"
+        SearchEngine engine = new SearchEngine(10);
 
-        ProductBasket basket = new ProductBasket();
+        // Добавляем товары
+        engine.add(new SimpleProduct("Молоко", 60));
+        engine.add(new DiscountedProduct("Яблоко", 50, 20));
+        engine.add(new FixPriceProduct("Апельсин"));
 
-        basket.addProduct(apple);
-        basket.addProduct(milk);
-        basket.addProduct(bread);
-        basket.addProduct(orange);
-        basket.addProduct(butter);
-        basket.addProduct(banana);
+        // Добавляем статьи
+        engine.add(new Article("Польза яблок", "Яблоки полезны для здоровья"));
+        engine.add(new Article("Как выбрать молоко", "Советы по выбору молока в магазине"));
+        engine.add(new Article("Апельсины зимой", "Почему апельсины лучше покупать зимой"));
 
-        System.out.println("Содержимое корзины: ");
-        basket.printBasket();
+        // Проверка поиска
+        String[] queries = {"яблоко", "молоко", "апельсин", "банан"};
 
-        int totalPrice = basket.getTotalPrice();
-        System.out.println("Общая стоимость корзины: " + totalPrice);
-
-        System.out.println("Есть ли в корзине 'Молоко'? " + basket.containsProductByName("МОЛОКО"));
-        System.out.println("Есть ли в корзине 'Банан'? " + basket.containsProductByName("Банан"));
-
-        basket.clear();
-
-        System.out.println("После очистки корзины: ");
-        basket.printBasket();
-
-        System.out.println("Общая стоимость корзины после очистки: " + basket.getTotalPrice());
-        System.out.println("Есть ли в корзине 'Яблоко' после очистки? " + basket.containsProductByName("Яблоко"));
+        for (String q : queries) {
+            Searchable[] results = engine.search(q);
+            System.out.println("Результаты поиска для " + q + ":");
+            System.out.println(Arrays.toString(results));
+        }
     }
 }
