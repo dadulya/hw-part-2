@@ -27,4 +27,39 @@ public class SearchEngine {
         }
         return results;
     }
+
+    private int countOccurrences(String text, String sub) {
+        int count = 0;
+        int index = 0;
+        text = text.toLowerCase();
+        sub = sub.toLowerCase();
+
+
+        int pos = text.toLowerCase().indexOf(sub.toLowerCase(), index);
+        while (pos != -1) {
+            count++;
+            index = pos + sub.length();
+            pos = text.toLowerCase().indexOf(sub.toLowerCase(), index);
+        }
+        return count;
+    }
+
+    public Searchable findBest(String search) throws BestResultNotFound {
+        int max = 0;
+        Searchable best = null;
+
+        for (int i = 0; i < count; i++) {
+            int occurrences = countOccurrences(items[i].getSearchTerm(), search);
+            if (occurrences > max) {
+                max = occurrences;
+                best = items[i];
+            }
+        }
+
+        if (best == null) {
+            throw new BestResultNotFound("Не найден объект для запроса: " + search);
+        }
+        return best;
+    }
 }
+
