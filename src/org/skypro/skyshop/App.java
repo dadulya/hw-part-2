@@ -1,42 +1,67 @@
 package org.skypro.skyshop;
 
-import org.skypro.skyshop.product.Product;
-import org.skypro.skyshop.basket.ProductBasket;
+import org.skypro.skyshop.article.Article;
+import org.skypro.skyshop.product.*;
+import org.skypro.skyshop.search.BestResultNotFound;
+import org.skypro.skyshop.search.SearchEngine;
+import org.skypro.skyshop.search.Searchable;
+
+import java.util.Arrays;
 
 public class App {
     public static void main(String[] args) {
 
-        Product apple = new Product("Яблоко", 50);
-        Product milk = new Product("Молоко", 60);
-        Product bread = new Product("Хлеб", 40);
-        Product orange = new Product("Апельсин", 60);
-        Product butter = new Product("Масло", 45);
-        Product banana = new Product("Банан", 50); //"Невозможно добавить продукт"
+        try {
+            new SimpleProduct("   ", 50);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Ошибка: " + e.getMessage());
+        }
 
-        ProductBasket basket = new ProductBasket();
+        try {
+            new SimpleProduct("Хлеб", 0);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Ошибка: " + e.getMessage());
+        }
 
-        basket.addProduct(apple);
-        basket.addProduct(milk);
-        basket.addProduct(bread);
-        basket.addProduct(orange);
-        basket.addProduct(butter);
-        basket.addProduct(banana);
+        try {
+            new DiscountedProduct("Сок", 100, 150);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Ошибка: " + e.getMessage());
+        }
 
-        System.out.println("Содержимое корзины: ");
-        basket.printBasket();
+        SearchEngine engine = new SearchEngine(10);
 
-        int totalPrice = basket.getTotalPrice();
-        System.out.println("Общая стоимость корзины: " + totalPrice);
+        // Добавляем товары
+        engine.add(new SimpleProduct("Молоко", 60));
+        engine.add(new DiscountedProduct("Яблоко", 50, 20));
+        engine.add(new FixPriceProduct("Апельсин"));
 
-        System.out.println("Есть ли в корзине 'Молоко'? " + basket.containsProductByName("МОЛОКО"));
-        System.out.println("Есть ли в корзине 'Банан'? " + basket.containsProductByName("Банан"));
+        // Добавляем статьи
+        engine.add(new Article("Польза яблок", "Яблоки полезны для здоровья"));
+        engine.add(new Article("Как выбрать молоко", "Советы по выбору молока в магазине"));
+        engine.add(new Article("Апельсины зимой", "Почему апельсины лучше покупать зимой"));
 
-        basket.clear();
+        // Проверка поиска
+        String[] queries = {"яблоко", "молоко", "апельсин", "банан"};
 
-        System.out.println("После очистки корзины: ");
-        basket.printBasket();
+        for (String q : queries) {
+            Searchable[] results = engine.search(q);
+            System.out.println("Результаты поиска для " + q + ":");
+            System.out.println(Arrays.toString(results));
+        }
 
-        System.out.println("Общая стоимость корзины после очистки: " + basket.getTotalPrice());
-        System.out.println("Есть ли в корзине 'Яблоко' после очистки? " + basket.containsProductByName("Яблоко"));
+        try {
+            Searchable best = engine.findBest("молоко");
+            System.out.println("Лучший результат: " + best.getStringRepresentation());
+        } catch (BestResultNotFound e) {
+            System.out.println("Ошибка: " + e.getMessage());
+        }
+
+        try {
+            Searchable best = engine.findBest("киви");
+            System.out.println("Лучший результат: " + best.getStringRepresentation());
+        } catch (BestResultNotFound e) {
+            System.out.println("Ошибка: " + e.getMessage());
+        }
     }
 }
