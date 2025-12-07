@@ -1,42 +1,94 @@
 package org.skypro.skyshop;
 
-import org.skypro.skyshop.product.Product;
+import org.skypro.skyshop.article.Article;
 import org.skypro.skyshop.basket.ProductBasket;
+import org.skypro.skyshop.product.*;
+import org.skypro.skyshop.search.*;
+import java.util.List;
 
 public class App {
     public static void main(String[] args) {
 
-        Product apple = new Product("Яблоко", 50);
-        Product milk = new Product("Молоко", 60);
-        Product bread = new Product("Хлеб", 40);
-        Product orange = new Product("Апельсин", 60);
-        Product butter = new Product("Масло", 45);
-        Product banana = new Product("Банан", 50); //"Невозможно добавить продукт"
+        // Проверки создания продуктов
+        try {
+            new SimpleProduct("   ", 50);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Ошибка: " + e.getMessage());
+        }
+
+        try {
+            new SimpleProduct("Хлеб", 0);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Ошибка: " + e.getMessage());
+        }
+
+        try {
+            new DiscountedProduct("Сок", 100, 150);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Ошибка: " + e.getMessage());
+        }
+
+        SearchEngine engine = new SearchEngine();
+
+        engine.add(new SimpleProduct("Молоко", 60));
+        engine.add(new DiscountedProduct("Яблоко", 50, 20));
+        engine.add(new FixPriceProduct("Апельсин"));
+
+        engine.add(new Article("Польза яблок", "Яблоки полезны для здоровья"));
+        engine.add(new Article("Как выбрать молоко", "Советы по выбору молока в магазине"));
+        engine.add(new Article("Апельсины зимой", "Почему апельсины лучше покупать зимой"));
+
+        String[] queries = {"яблоко", "молоко", "апельсин", "банан"};
+
+        for (String q : queries) {
+            List<Searchable> results = engine.search(q);
+            System.out.println("Результаты поиска для " + q + ":");
+            System.out.println(results);
+        }
+
+        try {
+            Searchable best = engine.findBest("молоко");
+            System.out.println("Лучший результат: " + best.getStringRepresentation());
+        } catch (BestResultNotFound e) {
+            System.out.println("Ошибка: " + e.getMessage());
+        }
+
+        try {
+            Searchable best = engine.findBest("киви");
+            System.out.println("Лучший результат: " + best.getStringRepresentation());
+        } catch (BestResultNotFound e) {
+            System.out.println("Ошибка: " + e.getMessage());
+        }
+
 
         ProductBasket basket = new ProductBasket();
+        basket.addProduct(new SimpleProduct("Молоко", 60));
+        basket.addProduct(new SimpleProduct("Хлеб", 30));
+        basket.addProduct(new SimpleProduct("Молоко", 60));
+        basket.addProduct(new FixPriceProduct("Апельсин"));
 
-        basket.addProduct(apple);
-        basket.addProduct(milk);
-        basket.addProduct(bread);
-        basket.addProduct(orange);
-        basket.addProduct(butter);
-        basket.addProduct(banana);
-
-        System.out.println("Содержимое корзины: ");
+        System.out.println("Корзина:");
         basket.printBasket();
 
-        int totalPrice = basket.getTotalPrice();
-        System.out.println("Общая стоимость корзины: " + totalPrice);
+        // Удаляем Молоко
+        System.out.println("Удаляем 'Молоко':");
+        List<Product> removed = basket.removeByName("Молоко");
+        System.out.println("Удалено:");
+        System.out.println(removed);
 
-        System.out.println("Есть ли в корзине 'Молоко'? " + basket.containsProductByName("МОЛОКО"));
-        System.out.println("Есть ли в корзине 'Банан'? " + basket.containsProductByName("Банан"));
-
-        basket.clear();
-
-        System.out.println("После очистки корзины: ");
+        System.out.println("Корзина после удаления:");
         basket.printBasket();
 
-        System.out.println("Общая стоимость корзины после очистки: " + basket.getTotalPrice());
-        System.out.println("Есть ли в корзине 'Яблоко' после очистки? " + basket.containsProductByName("Яблоко"));
+        // Пытаемся удалить несуществующий продукт
+        System.out.println("Удаляем 'Банан':");
+        List<Product> removed2 = basket.removeByName("Банан");
+
+        if (removed2.isEmpty()) {
+            System.out.println("Список пуст");
+        }
+
+        System.out.println("Корзина после удаления:");
+        basket.printBasket();
     }
 }
+
