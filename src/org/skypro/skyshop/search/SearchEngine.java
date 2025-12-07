@@ -1,28 +1,22 @@
 package org.skypro.skyshop.search;
 
-public class SearchEngine {
-    private Searchable[] items;
-    private int count = 0;
+import java.util.ArrayList;
+import java.util.List;
 
-    public SearchEngine(int capacity) {
-        items = new Searchable[capacity];
-    }
+public class SearchEngine {
+    private List<Searchable> items = new ArrayList<>();
+
 
     public void add(Searchable s) {
-        if (count < items.length) {
-            items[count++] = s;
-        } else {
-            System.out.println("Невозможно добавить элемент, массив заполнен");
-        }
+        items.add(s);
     }
 
-    public Searchable[] search(String query) {
-        Searchable[] results = new Searchable[5];
-        int index = 0;
-        for (int i = 0; i < count; i++) {
-            if (items[i].getSearchTerm().toLowerCase().contains(query.toLowerCase())) {
-                results[index++] = items[i];
-                if (index == 5) break;
+    public List<Searchable> search(String query) {
+        List<Searchable> results = new ArrayList<>();
+
+        for (Searchable item : items) {
+            if (item.getSearchTerm().toLowerCase().contains(query.toLowerCase())) {
+                results.add(item);
             }
         }
         return results;
@@ -35,11 +29,11 @@ public class SearchEngine {
         sub = sub.toLowerCase();
 
 
-        int pos = text.toLowerCase().indexOf(sub.toLowerCase(), index);
+        int pos = text.indexOf(sub, index);
         while (pos != -1) {
             count++;
             index = pos + sub.length();
-            pos = text.toLowerCase().indexOf(sub.toLowerCase(), index);
+            pos = text.indexOf(sub, index);
         }
         return count;
     }
@@ -48,11 +42,11 @@ public class SearchEngine {
         int max = 0;
         Searchable best = null;
 
-        for (int i = 0; i < count; i++) {
-            int occurrences = countOccurrences(items[i].getSearchTerm(), search);
+        for (Searchable item : items) {
+            int occurrences = countOccurrences(item.getSearchTerm(), search);
             if (occurrences > max) {
                 max = occurrences;
-                best = items[i];
+                best = item;
             }
         }
 
