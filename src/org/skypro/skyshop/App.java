@@ -4,7 +4,6 @@ import org.skypro.skyshop.article.Article;
 import org.skypro.skyshop.basket.ProductBasket;
 import org.skypro.skyshop.product.*;
 import org.skypro.skyshop.search.*;
-
 import java.util.List;
 
 public class App {
