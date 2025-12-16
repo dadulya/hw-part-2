@@ -4,29 +4,11 @@ import org.skypro.skyshop.article.Article;
 import org.skypro.skyshop.basket.ProductBasket;
 import org.skypro.skyshop.product.*;
 import org.skypro.skyshop.search.*;
-import java.util.List;
+
+import java.util.Map;
 
 public class App {
     public static void main(String[] args) {
-
-        // Проверки создания продуктов
-        try {
-            new SimpleProduct("   ", 50);
-        } catch (IllegalArgumentException e) {
-            System.out.println("Ошибка: " + e.getMessage());
-        }
-
-        try {
-            new SimpleProduct("Хлеб", 0);
-        } catch (IllegalArgumentException e) {
-            System.out.println("Ошибка: " + e.getMessage());
-        }
-
-        try {
-            new DiscountedProduct("Сок", 100, 150);
-        } catch (IllegalArgumentException e) {
-            System.out.println("Ошибка: " + e.getMessage());
-        }
 
         SearchEngine engine = new SearchEngine();
 
@@ -41,25 +23,17 @@ public class App {
         String[] queries = {"яблоко", "молоко", "апельсин", "банан"};
 
         for (String q : queries) {
-            List<Searchable> results = engine.search(q);
+            Map<String, Searchable> results = engine.search(q);
             System.out.println("Результаты поиска для " + q + ":");
-            System.out.println(results);
-        }
 
-        try {
-            Searchable best = engine.findBest("молоко");
-            System.out.println("Лучший результат: " + best.getStringRepresentation());
-        } catch (BestResultNotFound e) {
-            System.out.println("Ошибка: " + e.getMessage());
-        }
+            if (results.isEmpty()) {
+                System.out.println("Ничего не найдено");
+            }
 
-        try {
-            Searchable best = engine.findBest("киви");
-            System.out.println("Лучший результат: " + best.getStringRepresentation());
-        } catch (BestResultNotFound e) {
-            System.out.println("Ошибка: " + e.getMessage());
+            for (Searchable item : results.values()) {
+                System.out.println(item.getStringRepresentation());
+            }
         }
-
 
         ProductBasket basket = new ProductBasket();
         basket.addProduct(new SimpleProduct("Молоко", 60));
@@ -70,25 +44,10 @@ public class App {
         System.out.println("Корзина:");
         basket.printBasket();
 
-        // Удаляем Молоко
         System.out.println("Удаляем 'Молоко':");
-        List<Product> removed = basket.removeByName("Молоко");
-        System.out.println("Удалено:");
-        System.out.println(removed);
-
-        System.out.println("Корзина после удаления:");
-        basket.printBasket();
-
-        // Пытаемся удалить несуществующий продукт
-        System.out.println("Удаляем 'Банан':");
-        List<Product> removed2 = basket.removeByName("Банан");
-
-        if (removed2.isEmpty()) {
-            System.out.println("Список пуст");
-        }
+        System.out.println(basket.removeByName("Молоко"));
 
         System.out.println("Корзина после удаления:");
         basket.printBasket();
     }
 }
-
