@@ -1,24 +1,23 @@
 package org.skypro.skyshop.search;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 public class SearchEngine {
-    private List<Searchable> items = new ArrayList<>();
+    private Set<Searchable> items = new HashSet<>();
 
 
     public void add(Searchable s) {
         items.add(s);
     }
 
-    public Map<String, Searchable> search(String query) {
-        Map<String, Searchable> results = new TreeMap<>();
+    public Set<Searchable> search(String query) {
+        Set<Searchable> results = new TreeSet<>(new SearchableComparator());
 
         for (Searchable item : items) {
             if (item.getSearchTerm().toLowerCase().contains(query.toLowerCase())) {
-                results.put(item.getObjectName(), item);
+                results.add(item);
             }
         }
         return results;

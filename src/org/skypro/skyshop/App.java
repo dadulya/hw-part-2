@@ -6,6 +6,7 @@ import org.skypro.skyshop.product.*;
 import org.skypro.skyshop.search.*;
 
 import java.util.Map;
+import java.util.Set;
 
 public class App {
     public static void main(String[] args) {
@@ -23,14 +24,14 @@ public class App {
         String[] queries = {"яблоко", "молоко", "апельсин", "банан"};
 
         for (String q : queries) {
-            Map<String, Searchable> results = engine.search(q);
+            Set<Searchable> results = engine.search(q);
             System.out.println("Результаты поиска для " + q + ":");
 
             if (results.isEmpty()) {
                 System.out.println("Ничего не найдено");
             }
 
-            for (Searchable item : results.values()) {
+            for (Searchable item : results) {
                 System.out.println(item.getStringRepresentation());
             }
         }
